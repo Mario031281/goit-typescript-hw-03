@@ -5,51 +5,48 @@ class Key {
     return this.signature;
   }
 }
-class MyHouse {
-  private locked: boolean = true;
-  private key: Key | null;
 
-  constructor(key: Key | null) {
+abstract class House {
+  protected door: boolean;
+  protected key: Key;
+  protected tenants: Person[] = [];
+  abstract openDoor(key: Key): void;
+
+  constructor(key: Key) {
     this.key = key;
+    this.door = false;
   }
 
-  openDoor(key: Key | null): void {
-    if (key === this.key) {
-      this.locked = false;
-      console.log("Door unlocked.");
-    } else {
-      console.log("The key doesn't fit. The doors remain closed.");
+  public comeIn(tenant: Person) {
+    if (this.door) {
+      this.tenants.push(tenant);
     }
   }
+}
 
-  comeIn(person: Person): void {
-    if (!this.locked) {
-      console.log(`${person.constructor.name} enters the House.`);
-    } else {
-      console.log("The door is closed. You can't log in.");
+class MyHouse extends House {
+  openDoor(key: Key | null): void {
+    if (key && key.getSignature() === this.key.getSignature()) {
+      this.door = true;
+      console.log("Door unlocked.");
     }
   }
 }
 
 class Person {
-  private key: Key | null;
+  constructor(private key: Key) {}
 
-  constructor(key: Key) {
-    this.key = key;
-  }
-
-  getKey(): Key | null {
+  getKey() {
     return this.key;
   }
 }
 
 const key = new Key();
-
 const house = new MyHouse(key);
-const person = new Person(key);
+const personKey = new Key();
+const person = new Person(personKey);
 
 house.openDoor(person.getKey());
-
 house.comeIn(person);
 
 export {};
